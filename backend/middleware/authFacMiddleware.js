@@ -20,7 +20,7 @@ const facultyAuth = async (req, res, next) => {
 
     console.log(decoded.email);
     const result = await db.query(
-      `SELECT facid, facname, facdept, facdesignation, facsubject, facemail
+      `SELECT facid, facname, facdept, facdesignation, facsubject, facemail, role
        FROM teacher_data
        WHERE facemail = $1`,
       [decoded.email]

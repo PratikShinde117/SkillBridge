@@ -16,12 +16,13 @@ const {
   publishScenarioAssignment,
   getScenariosForStudent
 } = require("../controllers/scenarioControllerV2");
+const { aiLimiter } = require("../middleware/rateLimiter");
 
 // Faculty routes
 router.get("/all", facultyAuth, getAllScenarios);
 router.get("/search", facultyAuth, searchScenarios);
-router.post("/generate", facultyAuth, generateScenario);
-router.post("/modify", facultyAuth, modifyScenario);
+router.post("/generate", facultyAuth, aiLimiter, generateScenario);
+router.post("/modify", facultyAuth, aiLimiter, modifyScenario);
 router.post("/save", facultyAuth, saveScenario);
 router.put("/:scenario_id", facultyAuth, updateScenario);
 router.delete("/:scenario_id", facultyAuth, deleteScenario);

@@ -4,7 +4,7 @@ const db = require("../db");
 const createFaculty = async ({facid, facname, facdept, facpass ,facdesignation, facsubject, facemail}) =>{
     const hashP = await bcrypt.hash(facpass,10);
 
-    const res = await db.query(`insert into teacher_data(facid, facname, facdept, facpass ,facdesignation, facsubject, facemail) values($1,$2,$3,$4,$5,$6,$7)`, [facid, facname, facdept, hashP ,facdesignation, facsubject, facemail]);
+    const res = await db.query(`insert into teacher_data(facid, facname, facdept, facpass ,facdesignation, facsubject, facemail, role) values($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`, [facid, facname, facdept, hashP ,facdesignation, facsubject, facemail, 'faculty']);
 
     return res.rows[0];
 

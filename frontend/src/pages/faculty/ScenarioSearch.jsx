@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "../../api/axios";
+import { Trash2 } from "lucide-react";
 
 const NAV_ITEMS = [
   {label: "Dashboard", path: "/faculty/dashboard" },
@@ -161,7 +162,7 @@ export default function ScenarioSearch() {
             </div>
           </div>
           <button style={S.logoutBtn} onClick={handleLogout}>
-            <span>🚪</span> Sign Out
+             Sign Out
           </button>
         </div>
       </aside>
@@ -180,11 +181,11 @@ export default function ScenarioSearch() {
                 style={S.assignBtn}
                 onClick={() => navigate("/faculty/scenarios/create-assignment", { state: { scenario_ids: selectedIds, subject: filters.subject } })}
               >
-                📦 Assign Selected ({selectedIds.length})
+                Assign Selected ({selectedIds.length})
               </button>
             )}
             <button style={S.generateBtn} onClick={() => navigate("/faculty/scenarios/generate")}>
-              ✨ Generate New
+              Generate New
             </button>
           </div>
         </div>
@@ -246,7 +247,7 @@ export default function ScenarioSearch() {
             <h3 style={S.emptyTitle}>No scenarios found</h3>
             <p style={S.emptyDesc}>Try different filters or generate a new scenario with AI</p>
             <button style={S.generateBtn} onClick={() => navigate("/faculty/scenarios/generate")}>
-              ✨ Generate Scenario
+               Generate Scenario
             </button>
           </div>
         )}
@@ -317,10 +318,10 @@ export default function ScenarioSearch() {
                         style={S.editBtn}
                         onClick={() => navigate("/faculty/scenarios/modify", { state: { scenario_id: sc.scenario_id } })}
                       >
-                        ✏️ Edit
+                         Edit
                       </button>
                       <button style={S.deleteBtn} onClick={() => handleDelete(sc.scenario_id)}>
-                        🗑️
+                        <Trash2 size={22} color="#040404" />
                       </button>
                     </div>
                   </div>

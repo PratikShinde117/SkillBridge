@@ -25,10 +25,10 @@ const getStudentYearColumn = async () => {
 };
 const registerStud = async(req,res) => {
     try{
-    const {roll_no, studname, studemail, studdept, studdiv, studbatch, studepass} = req.body;
-    console.log(req.body);
+    const {roll_no, studname, studemail, studdept, studdiv, studbatch, studepass, student_year} = req.body;
+    console.log(roll_no, studname, studemail, studdept, studdiv, studbatch, studepass, student_year);
     const isExist = await findstudbyRoll(roll_no);
-
+    console.log(isExist);
     if(isExist){
         return res.status(400).json({ error: "Student already registered" });
     }
@@ -41,7 +41,9 @@ const registerStud = async(req,res) => {
         studdept,
         studdiv,
         studbatch,
+        student_year
     });
+    console.log("new student:", newStud);
 
     res.status(201).json({message:"Registered successfully", student: newStud});
 }

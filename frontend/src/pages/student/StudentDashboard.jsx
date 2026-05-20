@@ -2,6 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "../../api/axios";
 import eval_api from "../../api/evaluation";
+import {
+  BookOpen,
+  ClipboardList,
+  Target,
+  CheckCircle,
+  SquarePen,
+  FileUser
+} from "lucide-react";
 
 const matchesAssignmentAccess = (assignment, studentProfile) => {
   if (!assignment || !studentProfile) return false;
@@ -136,10 +144,10 @@ const StudentDashboard = () => {
   const totalCompleted = completedAssignments.length;
 
   const STATS = [
-    { value: assignments.length, label: "Total Assigned", icon: "📚", color: "#6366f1", bg: "#ede9fe" },
-    { value: activeQuestionAssignments.length, label: "Question Pending", icon: "📝", color: "#2563eb", bg: "#dbeafe" },
-    { value: activeScenarioAssignments.length, label: "Scenario Pending", icon: "🎯", color: "#7c3aed", bg: "#f3e8ff" },
-    { value: totalCompleted, label: "Completed", icon: "✅", color: "#059669", bg: "#ecfdf5" },
+    { value: assignments.length, label: "Total Assigned", icon: BookOpen, color: "#6366f1", bg: "#ede9fe" },
+    { value: activeQuestionAssignments.length, label: "Question Pending", icon: ClipboardList, color: "#2563eb", bg: "#dbeafe" },
+    { value: activeScenarioAssignments.length, label: "Scenario Pending", icon: Target, color: "#7c3aed", bg: "#f3e8ff" },
+    { value: totalCompleted, label: "Completed", icon: CheckCircle, color: "#059669", bg: "#ecfdf5" },
   ];
 
   // ===== RENDER HELPERS =====
@@ -158,6 +166,7 @@ const StudentDashboard = () => {
 
     const deadlineDate = item.deadline ? new Date(item.deadline) : null;
     const isUrgent = deadlineDate && (deadlineDate - Date.now()) < 86400000 * 2 && !locked;
+    const over = deadlineDate && deadlineDate.getTime() < Date.now();
 
     return (
       <div key={item.assignment_id} style={{
@@ -169,7 +178,7 @@ const StudentDashboard = () => {
           <div style={{ flex: 1 }}>
             <div style={S.aCardMeta}>
               <span style={isScenario ? S.typeScenario : S.typeQuestion}>
-                {isScenario ? "🎯 Scenario" : "📝 Question"}
+                {isScenario ? " Scenario" : "Question"}
               </span>
               <span style={S.aId}>#{item.assignment_id}</span>
               {isUrgent && <span style={S.urgentBadge}>⚡ Due Soon</span>}
@@ -200,22 +209,46 @@ const StudentDashboard = () => {
 
         <div style={S.aCardBottom}>
           {!showEval ? (
+            // <button
+            //   disabled={locked}
+            //   onClick={handleStart}
+            //   style={{
+            //     ...S.startBtn,
+            //     background: locked ? "#e2e8f0" : isScenario ? "linear-gradient(135deg,#7c3aed,#8b5cf6)" : "linear-gradient(135deg,#2563eb,#3b82f6)",
+            //     color: locked ? "#94a3b8" : "#fff",
+            //     cursor: locked ? "not-allowed" : "pointer",
+            //   }}
+            // >
+            //   {locked ? "Completed" : isScenario ? "Start Scenario →" : "Start Test →"}
+            // </button>
+
             <button
-              disabled={locked}
-              onClick={handleStart}
-              style={{
-                ...S.startBtn,
-                background: locked ? "#e2e8f0" : isScenario ? "linear-gradient(135deg,#7c3aed,#8b5cf6)" : "linear-gradient(135deg,#2563eb,#3b82f6)",
-                color: locked ? "#94a3b8" : "#fff",
-                cursor: locked ? "not-allowed" : "pointer",
-              }}
-            >
-              {locked ? "Completed" : isScenario ? "Start Scenario →" : "Start Test →"}
-            </button>
+          disabled={locked || over}
+          onClick={handleStart}
+          style={{
+            ...S.startBtn,
+            background:
+              locked || over
+                ? "#e2e8f0"
+                : isScenario
+                ? "linear-gradient(135deg,#7c3aed,#8b5cf6)"
+                : "linear-gradient(135deg,#2563eb,#3b82f6)",
+            color: locked || over ? "#94a3b8" : "#fff",
+            cursor: locked || over ? "not-allowed" : "pointer",
+          }}
+        >
+          {locked
+            ? "Completed"
+            : over
+            ? "Deadline Passed"
+            : isScenario
+            ? "Start Scenario →"
+            : "Start Test →"}
+        </button>
           ) : (
             <div style={S.evalRow}>
               <button style={S.evalBtn} onClick={() => navigate(evalPath)}>
-                📊 View Results
+                View Results
               </button>
               {status && <span style={S.statusSmall}>{status}</span>}
             </div>
@@ -290,7 +323,7 @@ const StudentDashboard = () => {
             </div>
           </div>
           <button style={S.logoutBtn} onClick={handleLogout}>
-            <span>🚪</span> Sign Out
+             Sign Out
           </button>
         </div>
       </aside>
@@ -314,7 +347,7 @@ const StudentDashboard = () => {
             </header>
 
             {/* Stats */}
-            <div style={S.statsGrid}>
+            {/* <div style={S.statsGrid}>
               {STATS.map((stat, i) => (
                 <div key={i} style={S.statCard}>
                   <div style={{ ...S.statIcon, background: stat.bg, color: stat.color }}>{stat.icon}</div>
@@ -324,7 +357,35 @@ const StudentDashboard = () => {
                   </div>
                 </div>
               ))}
-            </div>
+            </div> */}
+
+            <div style={S.statsGrid}>
+  {STATS.map((stat, i) => {
+
+    const Icon = stat.icon;
+
+    return (
+      <div key={i} style={S.statCard}>
+
+        <div
+          style={{
+            ...S.statIcon,
+            background: stat.bg,
+            color: stat.color
+          }}
+        >
+          <Icon size={22} />
+        </div>
+
+        <div>
+          <div style={S.statValue}>{stat.value}</div>
+          <div style={S.statLabel}>{stat.label}</div>
+        </div>
+
+      </div>
+    );
+  })}
+</div>
 
             {/* Quick Actions */}
             <h2 style={S.sectionTitle}>Quick Actions</h2>
@@ -333,7 +394,7 @@ const StudentDashboard = () => {
                 onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; }}
               >
-                <div style={{ ...S.qaIcon, background: "linear-gradient(135deg,#3b82f6,#2563eb)" }}>📝</div>
+                <div style={{ ...S.qaIcon, background: "linear-gradient(135deg,#3b82f6,#2563eb)" }}><SquarePen size={22} color="#fff" /></div>
                 <div>
                   <div style={S.qaTitle}>Question Assignments</div>
                   <div style={S.qaDesc}>{activeQuestionAssignments.length} pending</div>
@@ -344,7 +405,7 @@ const StudentDashboard = () => {
                 onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; }}
               >
-                <div style={{ ...S.qaIcon, background: "linear-gradient(135deg,#7c3aed,#8b5cf6)" }}>🎯</div>
+                <div style={{ ...S.qaIcon, background: "linear-gradient(135deg,#7c3aed,#8b5cf6)" }}><Target size={22} color="#fff" /></div>
                 <div>
                   <div style={S.qaTitle}>Scenario Assignments</div>
                   <div style={S.qaDesc}>{activeScenarioAssignments.length} pending</div>
@@ -355,7 +416,7 @@ const StudentDashboard = () => {
                 onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; }}
               >
-                <div style={{ ...S.qaIcon, background: "linear-gradient(135deg,#059669,#10b981)" }}>✅</div>
+                <div style={{ ...S.qaIcon, background: "linear-gradient(135deg,#059669,#10b981)" }}><CheckCircle size={22} color="#fff" /></div>
                 <div>
                   <div style={S.qaTitle}>Completed</div>
                   <div style={S.qaDesc}>{totalCompleted} assignments</div>
@@ -366,7 +427,7 @@ const StudentDashboard = () => {
                 onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; }}
               >
-                <div style={{ ...S.qaIcon, background: "linear-gradient(135deg,#d97706,#f59e0b)" }}>📄</div>
+                <div style={{ ...S.qaIcon, background: "linear-gradient(135deg,#d97706,#f59e0b)" }}><FileUser size={22} color="#fff" /></div>
                 <div>
                   <div style={S.qaTitle}>Resume Analyzer</div>
                   <div style={S.qaDesc}>Upload & analyze</div>
@@ -395,7 +456,7 @@ const StudentDashboard = () => {
           <>
             <header style={S.header}>
               <div>
-                <h1 style={S.pageTitle}>📝 Question-Based Assignments</h1>
+                <h1 style={S.pageTitle}> Question-Based Assignments</h1>
                 <p style={S.pageSub}>{activeQuestionAssignments.length} pending assignment{activeQuestionAssignments.length !== 1 ? "s" : ""}</p>
               </div>
             </header>
@@ -418,7 +479,7 @@ const StudentDashboard = () => {
           <>
             <header style={S.header}>
               <div>
-                <h1 style={S.pageTitle}>🎯 Scenario-Based Assignments</h1>
+                <h1 style={S.pageTitle}> Scenario-Based Assignments</h1>
                 <p style={S.pageSub}>{activeScenarioAssignments.length} pending scenario{activeScenarioAssignments.length !== 1 ? "s" : ""}</p>
               </div>
             </header>
@@ -441,7 +502,7 @@ const StudentDashboard = () => {
           <>
             <header style={S.header}>
               <div>
-                <h1 style={S.pageTitle}>✅ Completed Assignments</h1>
+                <h1 style={S.pageTitle}>Completed Assignments</h1>
                 <p style={S.pageSub}>{totalCompleted} completed assignment{totalCompleted !== 1 ? "s" : ""}</p>
               </div>
             </header>
@@ -464,7 +525,7 @@ const StudentDashboard = () => {
           <>
             <header style={S.header}>
               <div>
-                <h1 style={S.pageTitle}>📄 Resume Skill Analyzer</h1>
+                <h1 style={S.pageTitle}>Resume Skill Analyzer</h1>
                 <p style={S.pageSub}>Upload your resume and get AI-powered skill analysis</p>
               </div>
             </header>

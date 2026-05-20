@@ -17,6 +17,7 @@ import ScenarioSearch from "./pages/faculty/ScenarioSearch";
 import ScenarioGenerate from "./pages/faculty/ScenarioGenerate";
 import ScenarioModify from "./pages/faculty/ScenarioModify";
 import CreateScenarioAssignment from "./pages/faculty/CreateScenarioAssignment";
+import AdminDashboard from "./pages/faculty/AdminDashboard";
 
 function App() {
   return (
@@ -39,7 +40,7 @@ function App() {
   path="/faculty/assignment/:assignment_id/questions"
   element={<AssignmentQuestions />}
 />
-
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
         {/* ---- SCENARIO ROUTES ---- */}
         <Route path="/faculty/scenarios" element={<ScenarioSearch />} />
         <Route path="/faculty/scenarios/generate" element={<ScenarioGenerate />} />

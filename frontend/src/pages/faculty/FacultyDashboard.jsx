@@ -2,6 +2,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import api from "../../api/axios";
 
+import{Rocket, BookOpen, LucideNewspaper, Target, Clipboard, WandSparkles, SquarePen} from "lucide-react";
+
 const NAV_ITEMS = [
   {label: "Dashboard", path: "/faculty/dashboard" },
   {label: "Scenario Library", path: "/faculty/scenarios" },
@@ -73,17 +75,17 @@ const FacultyDashboard = () => {
   };
 
   const QUICK_ACTIONS = [
-    { icon: "✨", title: "Generate Scenario", desc: "Create AI-powered scenarios", path: "/faculty/scenarios/generate", gradient: "linear-gradient(135deg,#6366f1,#8b5cf6)" },
-    { icon: "📝", title: "Create Assignment", desc: "New question or scenario assignment", path: "/faculty/create-assignment", gradient: "linear-gradient(135deg,#3b82f6,#2563eb)" },
-    { icon: "🎯", title: "Scenario Library", desc: "Browse & manage scenarios", path: "/faculty/scenarios", gradient: "linear-gradient(135deg,#059669,#10b981)" },
-    { icon: "📋", title: "View Assignments", desc: "Track all assignments", path: "/faculty/view-assignments", gradient: "linear-gradient(135deg,#d97706,#f59e0b)" },
+    { icon: WandSparkles, title: "Generate Scenario", desc: "Create AI-powered scenarios", path: "/faculty/scenarios/generate", gradient: "linear-gradient(135deg,#6366f1,#8b5cf6)" },
+    { icon: SquarePen, title: "Create Assignment", desc: "New question or scenario assignment", path: "/faculty/create-assignment", gradient: "linear-gradient(135deg,#3b82f6,#2563eb)" },
+    { icon: Target, title: "Scenario Library", desc: "Browse & manage scenarios", path: "/faculty/scenarios", gradient: "linear-gradient(135deg,#059669,#10b981)" },
+    { icon: LucideNewspaper, title: "View Assignments", desc: "Track all assignments", path: "/faculty/view-assignments", gradient: "linear-gradient(135deg,#d97706,#f59e0b)" },
   ];
 
   const STATS = [
-    { value: totalAssignments, label: "Total Assignments", icon: "📚", color: "#6366f1", bg: "#ede9fe" },
-    { value: publishedAssignments, label: "Published", icon: "🚀", color: "#059669", bg: "#ecfdf5" },
-    { value: draftAssignments, label: "Drafts", icon: "📄", color: "#d97706", bg: "#fffbeb" },
-    { value: scenarioCount, label: "Scenarios", icon: "🎯", color: "#2563eb", bg: "#eff6ff" },
+    { value: totalAssignments, label: "Total Assignments", icon: BookOpen, color: "#6366f1", bg: "#ede9fe" },
+    { value: publishedAssignments, label: "Published", icon: Rocket, color: "#059669", bg: "#ecfdf5" },
+    { value: draftAssignments, label: "Drafts", icon: LucideNewspaper, color: "#d97706", bg: "#fffbeb" },
+    { value: scenarioCount, label: "Scenarios", icon: Target, color: "#2563eb", bg: "#eff6ff" },
   ];
 
   return (
@@ -127,7 +129,7 @@ const FacultyDashboard = () => {
             </div>
           </div>
           <button style={S.logoutBtn} onClick={handleLogout}>
-            <span>🚪</span> Sign Out
+            <span></span> Sign Out
           </button>
         </div>
       </aside>
@@ -150,7 +152,7 @@ const FacultyDashboard = () => {
         </header>
 
         {/* Stats Grid */}
-        <div style={S.statsGrid}>
+        {/* <div style={S.statsGrid}>
           {STATS.map((stat, i) => (
             <div key={i} style={S.statCard}>
               <div style={{ ...S.statIcon, background: stat.bg, color: stat.color }}>{stat.icon}</div>
@@ -160,10 +162,42 @@ const FacultyDashboard = () => {
               </div>
             </div>
           ))}
+        </div> */}
+        <div style={S.statsGrid}>
+  {STATS.map((stat, i) => {
+
+    const Icon = stat.icon;
+
+    return (
+      <div key={i} style={S.statCard}>
+
+        <div
+          style={{
+            ...S.statIcon,
+            background: stat.bg,
+            color: stat.color
+          }}
+        >
+          <Icon size={22} />
         </div>
 
+        <div>
+          <div style={S.statValue}>
+            {loading ? "—" : stat.value}
+          </div>
+
+          <div style={S.statLabel}>
+            {stat.label}
+          </div>
+        </div>
+
+      </div>
+    );
+  })}
+</div>
+
         {/* Quick Actions */}
-        <div style={S.sectionRow}>
+        {/* <div style={S.sectionRow}>
           <h2 style={S.sectionTitle}>Quick Actions</h2>
         </div>
         <div style={S.actionsGrid}>
@@ -183,7 +217,53 @@ const FacultyDashboard = () => {
               <span style={S.actionArrow}>→</span>
             </button>
           ))}
+        </div> */}
+
+
+        <div style={S.sectionRow}>
+  <h2 style={S.sectionTitle}>Quick Actions</h2>
+</div>
+
+<div style={S.actionsGrid}>
+  {QUICK_ACTIONS.map((qa, i) => {
+
+    const Icon = qa.icon;
+
+    return (
+      <button
+        key={i}
+        style={S.actionCard}
+        onClick={() => navigate(qa.path)}
+        onMouseEnter={e => {
+          e.currentTarget.style.transform = "translateY(-3px)";
+          e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,.08)";
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,.04)";
+        }}
+      >
+
+        <div
+          style={{
+            ...S.actionIcon,
+            background: qa.gradient
+          }}
+        >
+          <Icon size={22} color="#fff" />
         </div>
+
+        <div>
+          <div style={S.actionTitle}>{qa.title}</div>
+          <div style={S.actionDesc}>{qa.desc}</div>
+        </div>
+
+        <span style={S.actionArrow}>→</span>
+
+      </button>
+    );
+  })}
+</div>
 
         {/* Recent Assignments */}
         <div style={S.sectionRow}>
@@ -220,7 +300,7 @@ const FacultyDashboard = () => {
                     <td style={{ ...S.td, fontWeight: 600, color: "#0f172a" }}>{a.subject}</td>
                     <td style={S.td}>
                       <span style={a.assignment_type === "scenario" ? S.typeScenario : S.typeQuestion}>
-                        {a.assignment_type === "scenario" ? "🎯 Scenario" : "📝 Question"}
+                        {a.assignment_type === "scenario" ? " Scenario" : " Question"}
                       </span>
                     </td>
                     <td style={S.td}>

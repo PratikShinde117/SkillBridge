@@ -15,10 +15,13 @@
     "axios": "^1.13.5",
     "bcrypt": "^6.0.0",
     "body-parser": "^2.2.0",
+    "bullmq": "^5.76.8",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.4.1",
+    "helmet": "^8.1.0",
     "jsonrepair": "^3.13.3",
     "jsonwebtoken": "^9.0.2",
     "mammoth": "^1.10.0",
@@ -26,6 +29,7 @@
     "node-cron": "^4.2.1",
     "node-fetch": "^3.3.2",
     "pdf-parse": "^1.1.1",
-    "pg": "^8.16.3"
+    "pg": "^8.16.3",
+    "redis": "^5.12.1"
   }
 }

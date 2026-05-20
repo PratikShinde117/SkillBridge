@@ -23,10 +23,11 @@ const registerFac = async(req,res) => {
         facpass ,
         facdesignation, 
         facsubject, 
-        facemail
+        facemail,
+        
     });
 
-     res.status(201).json({message:"Registered successfully!", student: newFac});}
+     res.status(201).json({message:"Registered successfully!", faculty: newFac});}
 
      catch(err){
         console.error("Error during registration:", err.message);
@@ -53,7 +54,7 @@ const loginFac = async(req,res) => {
         return res.status(401).json({ error: "Invalid password" });
     }
 
-    const token = generatetoken({id : faculty.facid , email : faculty.facemail, faculty_name : faculty.facname});
+    const token = generatetoken({id : faculty.facid , email : faculty.facemail, faculty_name : faculty.facname, role: faculty.role});
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -69,8 +70,11 @@ const loginFac = async(req,res) => {
         Faculty : {
             facid : faculty.facid,
             facname : faculty.facname,
-            facemail : faculty.facemail
-
+            facemail : faculty.facemail,
+            facdept : faculty.facdept,
+            facdesignation : faculty.facdesignation,
+            facsubject : faculty.facsubject,
+            role : faculty.role
         }
     });
 }

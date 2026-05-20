@@ -2,6 +2,7 @@ require("dotenv").config();
 const axios = require("axios");
 const db = require("../db");
 const aiService = require("../services/aiService");
+const evaluationQueue = require("../queues/evaluationQueue");
 const scenarioRepo = require("../models/scenarioRepository");
 const {
   canStudentAccessAssignment,
@@ -203,6 +204,8 @@ const developAssignment = async (req, res) => {
   }
 };
 
+
+
 const addQuestionByFaculty = async (req, res) => {
   try {
     const { assignment_id } = req.params;
@@ -330,6 +333,57 @@ const getAssignmentsForStudentDashboard = async (req, res) => {
   }
 };
 
+
+
+// 🔹 Dashboard summary
+const getAdminDashboard = async (req, res) => {
+  try {
+    const [facultyCount, studentCount] = await Promise.all([
+      db.query(`SELECT COUNT(*) FROM teacher_data`),
+      db.query(`SELECT COUNT(*) FROM student_data`)
+    ]);
+
+    res.json({
+      success: true,
+      stats: {
+        totalFaculty: Number(facultyCount.rows[0].count),
+        totalStudents: Number(studentCount.rows[0].count)
+      }
+    });
+  } catch (err) {
+    console.error("Admin dashboard error:", err.message);
+    res.status(500).json({ error: "Failed to load dashboard" });
+  }
+};
+
+// 🔹 Get all faculty
+const getAllFaculty = async (req, res) => {
+  try {
+    const result = await db.query(
+      `SELECT facid, facname, facemail, facdept, role FROM teacher_data ORDER BY facname`
+    );
+
+    res.json({ success: true, faculty: result.rows });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch faculty" });
+  }
+};
+
+// 🔹 Get all students
+const getAllStudents = async (req, res) => {
+  try {
+    const result = await db.query(
+      `SELECT roll_no, studname, studemail, studdept, student_year FROM student_data ORDER BY studname`
+    );
+
+    res.json({ success: true, students: result.rows });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch students" });
+  }
+};
+
+
+
 const startTest = async (req, res) => {
   try {
     const submission = await startAssignment(
@@ -421,45 +475,63 @@ const submitTest = async (req, res) => {
 
     const updated = await submitAssignment(submission.submission_id, serializedAnswers);
 
-    let evaluationResponse;
-    if (assignment.assignment_type === "scenario") {
-      const scenarios = buildScenarioPayload(assignment.scenario_ids, answers);
-      evaluationResponse = await axios.post(`${EVALUATION_BASE_URL}/evaluate-scenario`, {
-        assignment_id: Number(assignment_id),
-        student_id: roll_no,
-        scenarios
-      });
-    } else {
-      const student_answers = {};
-      Object.entries(parseAnswers(answers)).forEach(([key, value]) => {
-        student_answers[String(key)] = value ?? "";
-      });
+    // let evaluationResponse;
+    // if (assignment.assignment_type === "scenario") {
+    //   const scenarios = buildScenarioPayload(assignment.scenario_ids, answers);
+    //   evaluationResponse = await axios.post(`${EVALUATION_BASE_URL}/evaluate-scenario`, {
+    //     assignment_id: Number(assignment_id),
+    //     student_id: roll_no,
+    //     scenarios
+    //   });
+    // } else {
+    //   const student_answers = {};
+    //   Object.entries(parseAnswers(answers)).forEach(([key, value]) => {
+    //     student_answers[String(key)] = value ?? "";
+    //   });
 
-      evaluationResponse = await axios.post(`${EVALUATION_BASE_URL}/evaluate-question`, {
-        assignment_id: Number(assignment_id),
-        student_id: roll_no,
-        student_answers
-      });
-    }
+    //   evaluationResponse = await axios.post(`${EVALUATION_BASE_URL}/evaluate-question`, {
+    //     assignment_id: Number(assignment_id),
+    //     student_id: roll_no,
+    //     student_answers
+    //   });
+    // }
 
-    await db.query(
-      `UPDATE assignment_submissions
-       SET evaluation_result = $1,
-           total_score = $2
-       WHERE submission_id = $3`,
-      [
-        JSON.stringify(evaluationResponse.data.evaluation_result),
-        Math.round(evaluationResponse.data.evaluation_result?.total_score || 0),
-        submission.submission_id
-      ]
-    );
+    // await db.query(
+    //   `UPDATE assignment_submissions
+    //    SET evaluation_result = $1,
+    //        total_score = $2
+    //    WHERE submission_id = $3`,
+    //   [
+    //     JSON.stringify(evaluationResponse.data.evaluation_result),
+    //     Math.round(evaluationResponse.data.evaluation_result?.total_score || 0),
+    //     submission.submission_id
+    //   ]
+    // );
 
-    res.json({
-      success: true,
-      status: updated.status,
-      submitted_at: updated.submitted_at,
-      evaluation_result: evaluationResponse.data.evaluation_result
-    });
+    // res.json({
+    //   success: true,
+    //   status: updated.status,
+    //   submitted_at: updated.submitted_at,
+    //   evaluation_result: evaluationResponse.data.evaluation_result
+    // });
+
+
+    await evaluationQueue.add("evaluateSubmission", {
+    submission_id: submission.submission_id,
+    assignment_id,
+    roll_no,
+    assignment_type: assignment.assignment_type,
+    answers,
+    scenario_ids: assignment.scenario_ids || []
+  });
+
+  res.json({
+  success: true,
+  status: updated.status,
+  submitted_at: updated.submitted_at,
+  message: "Submission received. Evaluation in progress."
+});
+
   } catch (err) {
     console.error("Submission failed:", err.response?.data || err.message);
     res.status(err.status || err.response?.status || 500).json({
@@ -689,5 +761,8 @@ module.exports = {
   getAssignmentsForFaculty,
   getFacultyAssignmentDetail,
   getAssignmentAnalyticsForFaculty,
-  saveAssignmentFeedbackForFaculty
+  saveAssignmentFeedbackForFaculty,
+  getAdminDashboard,
+  getAllFaculty,
+  getAllStudents
 };

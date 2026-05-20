@@ -16,44 +16,96 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // const handleLogin = async (e) => {
+  //   e.preventDefault();
+  //   setError("");
+  //   setLoading(true);
+
+  //   try {
+  //     let endpoint = "";
+
+  //     if (role === "student") endpoint = "/login-student";
+  //     if (role === "faculty" || role === "admin") endpoint = "/login-faculty";
+      
+
+  //     if (role === "student") {
+  //       await api.post(endpoint, {
+  //         studemail: email,
+  //         studpass: password,
+  //       });
+  //     } else {
+  //       await api.post(endpoint, {
+  //         facemail: email,
+  //         facpass: password,
+  //         facname: facname,
+  //       });
+  //     }
+
+  //     if (remember) {
+  //       localStorage.setItem("userEmail", email);
+  //     }
+
+  //     if (role === "student") navigate("/student/dashboard");
+  //     else {
+  //       const user = res.data.Faculty;
+  //       if (user.role === "admin") {
+  //         navigate("/admin/dashboard");
+  //       } else {
+  //         navigate("/faculty/dashboard");
+  //       }
+  //     }
+  //   } catch (err) {
+  //     setError(err.response?.data?.error || "Login failed");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+  e.preventDefault();
+  setError("");
+  setLoading(true);
 
-    try {
-      let endpoint = "";
+  try {
+    let endpoint = "";
 
-      if (role === "student") endpoint = "/login-student";
-      if (role === "faculty") endpoint = "/login-faculty";
-      if (role === "tp") endpoint = "/login-tp";
+    if (role === "student") endpoint = "/login-student";
+    if (role === "faculty" || role === "admin") endpoint = "/login-faculty";
 
-      if (role === "student") {
-        await api.post(endpoint, {
-          studemail: email,
-          studpass: password,
-        });
-      } else if (role === "faculty") {
-        await api.post(endpoint, {
-          facemail: email,
-          facpass: password,
-          facname: facname,
-        });
-      }
+    let res; // ✅ FIX: declare response
 
-      if (remember) {
-        localStorage.setItem("userEmail", email);
-      }
-
-      if (role === "student") navigate("/student/dashboard");
-      if (role === "faculty") navigate("/faculty/dashboard");
-      // if (role === "tp") navigate("/tp/dashboard");
-    } catch (err) {
-      setError(err.response?.data?.error || "Login failed");
-    } finally {
-      setLoading(false);
+    if (role === "student") {
+      res = await api.post(endpoint, {
+        studemail: email,
+        studpass: password,
+      });
+    } else {
+      res = await api.post(endpoint, {
+        facemail: email,
+        facpass: password,
+        facname: facname,
+      });
     }
-  };
+
+    if (remember) {
+      localStorage.setItem("userEmail", email);
+    }
+
+    if (role === "student") navigate("/student/dashboard");
+    else {
+      const user = res.data.Faculty; // ✅ now res exists
+      if (user.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/faculty/dashboard");
+      }
+    }
+  } catch (err) {
+    setError(err.response?.data?.error || "Login failed");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div style={styles.container}>

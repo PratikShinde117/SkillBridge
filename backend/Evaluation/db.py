@@ -26,11 +26,11 @@ def get_connection():
     
     if _conn is None or _conn.closed:
         _conn = psycopg2.connect(
-            dbname=os.getenv("DB_NAME", "skillbridge"),
-            user=os.getenv("DB_USER", "postgres"),
-            password=os.getenv("DB_PASS", ""),
-            host=os.getenv("DB_HOST", "localhost"),
-            port=os.getenv("DB_PORT", "5432")
+            dbname=os.getenv("DB_NAME"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASS"),
+            host=os.getenv("DB_HOST"),
+            port=os.getenv("DB_PORT")
         )
         _conn.autocommit = True
         print("✅ Database connected")
