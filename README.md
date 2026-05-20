@@ -143,7 +143,7 @@ SkillBridge_UUU/
 ## 1. Clone Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/PratikShinde117/SkillBridge
 cd SkillBridge_UUU
 ```
 
@@ -172,22 +172,18 @@ npm install
 Create `.env` inside backend folder:
 
 ```env
-PORT=5000
+DB_HOST = localhost
+DB_NAME = skillbridge
+DB_USER = postgres
+DB_PASS = *****
+DB_PORT = 5432
+GEMINI_API_KEY = ********
+JWT_SECRET = ********
+FRONTEND_URL = http://localhost:5173
+BACKEND_URL = http://localhost:5000
+BACKEND_PORT = 5000
+EVALUATION_SERVICE_URL = http://127.0.0.1:8000
 
-DB_USER=postgres
-DB_HOST=localhost
-DB_NAME=skillbridge
-DB_PASS=your_password
-DB_PORT=5432
-
-JWT_SECRET=your_secret_key
-
-FRONTEND_URL=http://localhost:5173
-
-REDIS_HOST=127.0.0.1
-REDIS_PORT=6379
-
-EVALUATION_SERVICE_URL=http://127.0.0.1:8000
 ```
 
 ---
@@ -224,18 +220,10 @@ npm install
 
 ---
 
-## 8. Create frontend `.env`
-
-```env
-VITE_API_BASE_URL=http://localhost:5000
-```
-
----
-
-## 9. Start frontend
+## 8. Start frontend
 
 ```bash
-npm run dev
+bun dev
 ```
 
 Frontend runs on:
@@ -248,7 +236,7 @@ http://localhost:5173
 
 # Python Evaluation Service Setup
 
-## 10. Navigate to evaluation service
+## 9. Navigate to evaluation service
 
 ```bash
 cd Evaluation
@@ -256,7 +244,7 @@ cd Evaluation
 
 ---
 
-## 11. Create virtual environment
+## 10. Create virtual environment
 
 ```bash
 python -m venv venv
@@ -264,7 +252,7 @@ python -m venv venv
 
 ---
 
-## 12. Activate virtual environment
+## 11. Activate virtual environment
 
 ### Windows
 
@@ -280,15 +268,15 @@ source venv/bin/activate
 
 ---
 
-## 13. Install dependencies
+## 12. Install required dependencies manually
 
 ```bash
-pip install -r requirements.txt
+pip install fastapi uvicorn sentence-transformers torch numpy scikit-learn python-dotenv psycopg2-binary
 ```
 
 ---
 
-## 14. Start FastAPI evaluation service
+## 13. Start FastAPI evaluation service
 
 ```bash
 uvicorn main:app --host 127.0.0.1 --port 8000 --reload
@@ -306,7 +294,7 @@ http://127.0.0.1:8000
 
 SkillBridge uses Redis for background evaluation processing.
 
-## 15. Start Redis using Docker
+## 14. Start Redis using Docker
 
 ```bash
 docker run -d --name redis-server -p 6379:6379 redis
@@ -324,7 +312,7 @@ docker ps
 
 # Start BullMQ Worker
 
-## 16. Run evaluation worker
+## 15. Run evaluation worker
 
 Open another terminal inside backend folder:
 
